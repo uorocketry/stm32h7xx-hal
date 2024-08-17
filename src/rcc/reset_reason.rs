@@ -2,6 +2,7 @@
 //! has reset
 
 use core::fmt::Display;
+use messages::sensor;
 
 /// Gets and clears the reason of why the mcu was reset
 #[rustfmt::skip]
@@ -184,6 +185,25 @@ impl defmt::Format for ResetReason {
                 "Could not determine the cause. RCC RSR bits were 0x{:X}",
                 rcc_rsr
             ),
+        }
+    }
+}
+
+impl Into<sensor::ResetReason> for ResetReason {
+    fn into(reason: ResetReason) -> Self {
+        match reason {
+            ResetReason::BrownoutReset => sensor::ResetReason::BrownoutReset, 
+            ResetReason::CpuReset => sensor::ResetReason::CpuReset,
+            ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously => sensor::ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously,
+            ResetReason::D1ExitsDStandbyMode => sensor::ResetReason::D1ExitsDStandbyMode,
+            ResetReason::D2ExitsDStandbyMode => sensor::ResetReason::D2ExitsDStandbyMode,
+            ResetReason::GenericWatchdogReset => sensor::ResetReason::GenericWatchdogReset,
+            ResetReason::IndependentWatchdogReset => sensor::ResetReason::IndependentWatchdogReset,
+            ResetReason::PinReset => sensor::ResetReason::PinReset, 
+            ResetReason::PowerOnReset => sensor::ResetReason::PowerOnReset,
+            ResetReason::SystemReset => sensor::ResetReason::SystemReset,
+            ResetReason::Unknown { rcc_rsr } => sensor::ResetReason::Unknown { rcc_rsr },
+            ResetReason::WindowWatchdogReset => sensor::ResetReason::WindowWatchdogReset
         }
     }
 }
