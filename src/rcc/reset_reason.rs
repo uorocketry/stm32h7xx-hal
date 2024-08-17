@@ -188,22 +188,39 @@ impl defmt::Format for ResetReason {
         }
     }
 }
-
-impl Into<sensor::ResetReason> for ResetReason {
-    fn into(reason: ResetReason) -> Self {
-        match reason {
-            ResetReason::BrownoutReset => sensor::ResetReason::BrownoutReset, 
-            ResetReason::CpuReset => sensor::ResetReason::CpuReset,
-            ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously => sensor::ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously,
-            ResetReason::D1ExitsDStandbyMode => sensor::ResetReason::D1ExitsDStandbyMode,
-            ResetReason::D2ExitsDStandbyMode => sensor::ResetReason::D2ExitsDStandbyMode,
-            ResetReason::GenericWatchdogReset => sensor::ResetReason::GenericWatchdogReset,
-            ResetReason::IndependentWatchdogReset => sensor::ResetReason::IndependentWatchdogReset,
-            ResetReason::PinReset => sensor::ResetReason::PinReset, 
-            ResetReason::PowerOnReset => sensor::ResetReason::PowerOnReset,
-            ResetReason::SystemReset => sensor::ResetReason::SystemReset,
-            ResetReason::Unknown { rcc_rsr } => sensor::ResetReason::Unknown { rcc_rsr },
-            ResetReason::WindowWatchdogReset => sensor::ResetReason::WindowWatchdogReset
+impl Into<sensor::ResetReason> for crate::rcc::ResetReason {
+    fn into(self) -> sensor::ResetReason {
+        match self {
+            crate::rcc::ResetReason::BrownoutReset => sensor::ResetReason::BrownoutReset, 
+            crate::rcc::ResetReason::CpuReset => sensor::ResetReason::CpuReset,
+            crate::rcc::ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously => sensor::ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously,
+            crate::rcc::ResetReason::D1ExitsDStandbyMode => sensor::ResetReason::D1ExitsDStandbyMode,
+            crate::rcc::ResetReason::D2ExitsDStandbyMode => sensor::ResetReason::D2ExitsDStandbyMode,
+            crate::rcc::ResetReason::GenericWatchdogReset => sensor::ResetReason::GenericWatchdogReset,
+            crate::rcc::ResetReason::IndependentWatchdogReset => sensor::ResetReason::IndependentWatchdogReset,
+            crate::rcc::ResetReason::PinReset => sensor::ResetReason::PinReset, 
+            crate::rcc::ResetReason::PowerOnReset => sensor::ResetReason::PowerOnReset,
+            crate::rcc::ResetReason::SystemReset => sensor::ResetReason::SystemReset,
+            crate::rcc::ResetReason::Unknown { rcc_rsr } => sensor::ResetReason::Unknown { rcc_rsr },
+            crate::rcc::ResetReason::WindowWatchdogReset => sensor::ResetReason::WindowWatchdogReset,
         }
     }
 }
+// impl From<crate::rcc::ResetReason> for sensor::ResetReason {
+//     fn from(reason: ResetReason) -> Self {
+//         match reason {
+//             sensor::ResetReason::BrownoutReset => crate::rcc::ResetReason::BrownoutReset, 
+//             sensor::ResetReason::CpuReset => crate::rcc::ResetReason::CpuReset,
+//             sensor::ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously => crate::rcc::ResetReason::D1EntersDStandbyErroneouslyOrCpuEntersCStopErroneously,
+//             sensor::ResetReason::D1ExitsDStandbyMode => crate::rcc::ResetReason::D1ExitsDStandbyMode,
+//             sensor::ResetReason::D2ExitsDStandbyMode => crate::rcc::ResetReason::D2ExitsDStandbyMode,
+//             sensor::ResetReason::GenericWatchdogReset => crate::rcc::ResetReason::GenericWatchdogReset,
+//             sensor::ResetReason::IndependentWatchdogReset => crate::rcc::ResetReason::IndependentWatchdogReset,
+//             sensor::ResetReason::PinReset => crate::rcc::ResetReason::PinReset, 
+//             sensor::ResetReason::PowerOnReset => crate::rcc::ResetReason::PowerOnReset,
+//             sensor::ResetReason::SystemReset => crate::rcc::ResetReason::SystemReset,
+//             sensor::ResetReason::Unknown { rcc_rsr } => crate::rcc::ResetReason::Unknown { rcc_rsr },
+//             sensor::ResetReason::WindowWatchdogReset => crate::rcc::ResetReason::WindowWatchdogReset
+//         }
+//     }
+// }
