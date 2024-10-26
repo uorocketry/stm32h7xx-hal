@@ -54,7 +54,8 @@ features = ["medium-ethernet", "proto-ipv4", "socket-raw"]
 optional = true
 
 [dependencies.chrono]
-version = "0.4"
+#version = "0.4"
+git = "https://github.com/uorocketry/chrono"
 default-features = false
 optional = true
 
