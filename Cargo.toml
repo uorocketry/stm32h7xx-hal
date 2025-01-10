@@ -27,6 +27,9 @@ targets = ["thumbv7em-none-eabihf"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
+proptest = { version = "1.2.0", optional = true }
+proptest-derive = { version = "0.3.0", optional = true }
+serde = {version = "1.0.150", default-features = false, features = ["derive"]}
 fugit = "0.3.5"
 embedded-hal = { version = "0.2.6", features = ["unproven"] }
 embedded-dma = "0.2.0"
@@ -84,9 +87,12 @@ tinybmp = "0.5"
 embedded-graphics = "0.8"
 otm8009a = "0.1"
 eg-seven-segment = "0.2.0"
+proptest-derive = "0.3.0"
+proptest = "1.2.0"
 
 [features]
 default = ["rt"]
+arbitrary = ["dep:proptest-derive", "dep:proptest"]
 device-selected = []
 revision_v = []
 rm0433 = ["gpio-h747"]          # aka. "single core" devices

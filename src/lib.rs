@@ -56,7 +56,7 @@
 //!
 //! * [`defmt`](https://defmt.ferrous-systems.com/) formatting for some types can be enabled with the feature `defmt`.
 
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(any(feature = "arbitrary", test)), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(non_camel_case_types)]
 
