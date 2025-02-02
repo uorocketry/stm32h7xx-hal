@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+* MSRV increased to Rust 1.80.0
+* **Breaking** Rename export `stm32h7xx-hal::hal` to `stm32h7xx-hal::hal_02` [#504]
+* **Breaking** Update `smoltcp` to `0.12.0` (from `0.11.0`) [#508]
+* ethernet: Fix eth::DesRing alignment [#510]
+* flash: Add `access_banks` method [#489]
+* qspi/octospi: Support different modes for each phase of an xspi operation [#488]
+* timer: Fix off-by-one-tick in timer period calculation [#491]
+* **Breaking** Update `smoltcp` to `0.12.0` (from `0.11.0`)
+* Examples use RTIC v2
+
 ## [v0.16.0] 2024-03-12
 
 * MSRV increased to Rust 1.66.1 [#473]
@@ -407,3 +417,9 @@
 [#473]: https://github.com/stm32-rs/stm32h7xx-hal/pull/473
 [#482]: https://github.com/stm32-rs/stm32h7xx-hal/pull/482
 [#484]: https://github.com/stm32-rs/stm32h7xx-hal/pull/484
+[#488]: https://github.com/stm32-rs/stm32h7xx-hal/pull/488
+[#489]: https://github.com/stm32-rs/stm32h7xx-hal/pull/489
+[#491]: https://github.com/stm32-rs/stm32h7xx-hal/pull/491
+[#504]: https://github.com/stm32-rs/stm32h7xx-hal/pull/504
+[#508]: https://github.com/stm32-rs/stm32h7xx-hal/pull/508
+[#510]: https://github.com/stm32-rs/stm32h7xx-hal/pull/510

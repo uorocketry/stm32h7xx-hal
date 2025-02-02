@@ -1,5 +1,5 @@
-//! Demo for STM32H735G-DK eval board using the Real Time for the Masses
-//! (RTIC) framework.
+//! Demo for STM32H735G-DK eval board using the Real-Time Interrupt-driven
+//! Concurrency (RTIC) framework.
 //!
 //! This demo responds to pings on 192.168.1.99 (IP address hardcoded below)
 //!
@@ -111,9 +111,8 @@ mod app {
     }
 
     #[init]
-    fn init(
-        mut ctx: init::Context,
-    ) -> (SharedResources, LocalResources, init::Monotonics) {
+
+    fn init(mut ctx: init::Context) -> (SharedResources, LocalResources) {
         utilities::logger::init();
         // Initialise power...
         let pwr = ctx.device.PWR.constrain();
@@ -158,6 +157,7 @@ mod app {
 
         let mac_addr = smoltcp::wire::EthernetAddress::from_bytes(&MAC_ADDRESS);
         let (eth_dma, eth_mac) = unsafe {
+            #[allow(static_mut_refs)] // TODO: Fix this
             DES_RING.write(ethernet::DesRing::new());
 
             ethernet::new(
@@ -175,6 +175,7 @@ mod app {
                     rmii_txd0,
                     rmii_txd1,
                 ),
+                #[allow(static_mut_refs)] // TODO: Fix this
                 DES_RING.assume_init_mut(),
                 mac_addr,
                 ccdr.peripheral.ETH1MAC,
@@ -192,6 +193,7 @@ mod app {
 
         // unsafe: mutable reference to static storage, we only do this once
         let store = unsafe {
+            #[allow(static_mut_refs)] // TODO: Fix this
             let store_ptr = STORE.as_mut_ptr();
 
             // Initialise the socket_storage field. Using `write` instead of
@@ -202,6 +204,7 @@ mod app {
 
             // Now that all fields are initialised we can safely use
             // assume_init_mut to return a mutable reference to STORE
+            #[allow(static_mut_refs)] // TODO: Fix this
             STORE.assume_init_mut()
         };
 
@@ -217,7 +220,6 @@ mod app {
                 lan8742a,
                 link_led,
             },
-            init::Monotonics(),
         )
     }
 

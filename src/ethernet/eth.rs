@@ -69,8 +69,12 @@ use self::emac_consts::*;
 /// Note that Copy and Clone are derived to support initialising an
 /// array of TDes, but you may not move a TDes after its address has
 /// been given to the ETH_DMA engine.
+///
+/// Both order and alignment is required by the ETH peripheral. The repr(C)
+/// ensures that alignment of the members is 4 with no padding on the target
+/// platform.
 #[derive(Copy, Clone)]
-#[repr(C, packed)]
+#[repr(C)]
 struct TDes {
     tdes0: u32,
     tdes1: u32,
@@ -94,7 +98,6 @@ impl TDes {
 }
 
 /// Store a ring of TDes and associated buffers
-#[repr(C, packed)]
 struct TDesRing<const TD: usize> {
     td: [TDes; TD],
     tbuf: [[u32; ETH_BUF_SIZE / 4]; TD],
@@ -187,7 +190,7 @@ impl<const TD: usize> TDesRing<TD> {
         self.td[x].tdes2 = (length as u32) & EMAC_TDES2_B1L;
 
         // Create a raw pointer in place without an intermediate reference. Use
-        // this to return a slice from the packed buffer
+        // this to return a slice from the buffer
         let addr = ptr::addr_of_mut!(self.tbuf[x]) as *mut _;
         core::slice::from_raw_parts_mut(addr, len)
     }
@@ -203,8 +206,12 @@ impl<const TD: usize> TDesRing<TD> {
 /// Note that Copy and Clone are derived to support initialising an
 /// array of RDes, but you may not move a RDes after its address has
 /// been given to the ETH_DMA engine.
+///
+/// Both order and alignment is required by the ETH peripheral. The repr(C)
+/// ensures that alignment of the members is 4 with no padding on the target
+/// platform.
 #[derive(Copy, Clone)]
-#[repr(C, packed)]
+#[repr(C)]
 struct RDes {
     rdes0: u32,
     rdes1: u32,
@@ -239,7 +246,6 @@ impl RDes {
 }
 
 /// Store a ring of RDes and associated buffers
-#[repr(C, packed)]
 struct RDesRing<const RD: usize> {
     rd: [RDes; RD],
     rbuf: [[u32; ETH_BUF_SIZE / 4]; RD],
@@ -332,16 +338,15 @@ impl<const RD: usize> RDesRing<RD> {
     ///
     /// Ensure that release() is called between subsequent calls to this
     /// function.
-    #[allow(clippy::mut_from_ref)]
-    pub unsafe fn buf_as_slice_mut(&self) -> &mut [u8] {
+    pub unsafe fn buf_as_slice(&self) -> &[u8] {
         let x = self.rdidx;
 
         // Write-back format
-        let addr = ptr::addr_of!(self.rbuf[x]) as *mut u8;
+        let addr = ptr::addr_of!(self.rbuf[x]) as *const u8;
         let len = (self.rd[x].rdes3 & EMAC_RDES3_PL) as usize;
 
         let len = core::cmp::min(len, ETH_BUF_SIZE);
-        core::slice::from_raw_parts_mut(addr, len)
+        core::slice::from_raw_parts(addr, len)
     }
 }
 
@@ -797,7 +802,7 @@ impl StationManagement for EthernetMAC {
 /// Define TxToken type and implement consume method
 pub struct TxToken<'a, const TD: usize>(&'a mut TDesRing<TD>);
 
-impl<'a, const TD: usize> phy::TxToken for TxToken<'a, TD> {
+impl<const TD: usize> phy::TxToken for TxToken<'_, TD> {
     fn consume<R, F>(self, len: usize, f: F) -> R
     where
         F: FnOnce(&mut [u8]) -> R,
@@ -813,12 +818,12 @@ impl<'a, const TD: usize> phy::TxToken for TxToken<'a, TD> {
 /// Define RxToken type and implement consume method
 pub struct RxToken<'a, const RD: usize>(&'a mut RDesRing<RD>);
 
-impl<'a, const RD: usize> phy::RxToken for RxToken<'a, RD> {
+impl<const RD: usize> phy::RxToken for RxToken<'_, RD> {
     fn consume<R, F>(self, f: F) -> R
     where
-        F: FnOnce(&mut [u8]) -> R,
+        F: FnOnce(&[u8]) -> R,
     {
-        let result = f(unsafe { self.0.buf_as_slice_mut() });
+        let result = f(unsafe { self.0.buf_as_slice() });
         self.0.release();
         result
     }

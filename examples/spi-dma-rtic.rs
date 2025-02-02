@@ -1,5 +1,5 @@
-//! Demo for STM32H747I-NUCLEO eval board using the Real Time Interrupt-driven Concurrency (RTIC)
-//! framework.
+//! Demo for STM32H747I-NUCLEO eval board using the Real-Time Interrupt-driven
+//! Concurrency (RTIC) framework.
 //!
 //! This example demonstrates using DMA to write data over a TX-only SPI interface.
 #![deny(warnings)]
@@ -45,9 +45,7 @@ mod app {
     #[local]
     struct LocalResources {}
     #[init]
-    fn init(
-        ctx: init::Context,
-    ) -> (SharedResources, LocalResources, init::Monotonics) {
+    fn init(ctx: init::Context) -> (SharedResources, LocalResources) {
         utilities::logger::init();
 
         // Initialise power...
@@ -107,7 +105,10 @@ mod app {
                 }
             }
 
-            unsafe { BUFFER.assume_init_mut() }
+            #[allow(static_mut_refs)] // TODO: Fix this
+            unsafe {
+                BUFFER.assume_init_mut()
+            }
         };
 
         let streams = hal::dma::dma::StreamsTuple::new(
@@ -129,11 +130,7 @@ mod app {
             _,
         > = hal::dma::Transfer::init(streams.1, spi, buffer, None, config);
 
-        (
-            SharedResources { cs, transfer },
-            LocalResources {},
-            init::Monotonics(),
-        )
+        (SharedResources { cs, transfer }, LocalResources {})
     }
 
     #[task(binds=DMA1_STR1, shared = [transfer, cs], priority=2)]

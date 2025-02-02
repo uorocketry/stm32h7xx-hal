@@ -38,9 +38,7 @@ mod app {
     }
 
     #[init]
-    fn init(
-        ctx: init::Context,
-    ) -> (SharedResources, LocalResources, init::Monotonics) {
+    fn init(ctx: init::Context) -> (SharedResources, LocalResources) {
         utilities::logger::init();
         let pwr = ctx.device.PWR.constrain();
         let pwrcfg = example_power!(pwr).freeze();
@@ -95,6 +93,7 @@ mod app {
         }
 
         // Now we may assume that EP_MEMORY is initialised
+        #[allow(static_mut_refs)] // TODO: Fix this
         let usb_bus = cortex_m::singleton!(
             : usb_device::class_prelude::UsbBusAllocator<UsbBus<USB1>> =
                 UsbBus::new(usb, unsafe { EP_MEMORY.assume_init_mut() })
@@ -117,7 +116,6 @@ mod app {
                 usb,
                 led: led.into_push_pull_output(),
             },
-            init::Monotonics(),
         )
     }
 

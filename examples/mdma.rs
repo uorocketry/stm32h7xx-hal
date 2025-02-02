@@ -61,7 +61,10 @@ fn main() -> ! {
                 value.as_mut_ptr().write(0x11223344u32);
             }
         }
-        unsafe { SOURCE_BUFFER.assume_init_mut() }
+        #[allow(static_mut_refs)] // TODO: Fix this
+        unsafe {
+            SOURCE_BUFFER.assume_init_mut()
+        }
     };
 
     //
@@ -118,6 +121,7 @@ fn main() -> ! {
     //
 
     // Reset source buffer
+    #[allow(static_mut_refs)] // TODO: Fix this
     let source_buffer = unsafe { SOURCE_BUFFER.assume_init_mut() };
     *source_buffer = [0xAABBCCDD; 200];
 
@@ -195,7 +199,9 @@ fn main() -> ! {
         Transfer::init_master(
             streams.1,
             MemoryToMemory::new(),
-            unsafe { mem::transmute(&mut target_buffer[..]) }, // Dest: TCM (stack)
+            unsafe {
+                mem::transmute::<&mut [u8], &mut [u8]>(&mut target_buffer[..])
+            }, // Dest: TCM (stack)
             Some(source_buffer), // Source: TCM (stack)
             config,
         )

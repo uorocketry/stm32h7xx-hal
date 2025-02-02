@@ -11,6 +11,7 @@ use crate::{
 use super::{common::BankSelect, Bank, Config, Qspi, QspiError, SamplingEdge};
 
 /// Used to indicate that an IO pin is not used by the QSPI interface.
+#[allow(unused)]
 pub struct NoIo {}
 
 /// Indicates a set of pins can be used for the QSPI interface on bank 1.
@@ -22,6 +23,7 @@ pub trait PinIo3Bank1 {}
 
 /// Indicates a set of pins can be used for the QSPI interface on bank 2.
 pub trait PinsBank2 {}
+#[allow(unused)]
 pub trait PinSckBank2 {}
 pub trait PinIo0Bank2 {}
 pub trait PinIo1Bank2 {}
@@ -302,8 +304,7 @@ impl Qspi<stm32::QUADSPI> {
         });
 
         let spi_frequency = config.frequency.raw();
-        let divisor = match (spi_kernel_ck + spi_frequency - 1) / spi_frequency
-        {
+        let divisor = match spi_kernel_ck.div_ceil(spi_frequency) {
             divisor @ 1..=256 => divisor - 1,
             _ => panic!("Invalid QSPI frequency requested"),
         };

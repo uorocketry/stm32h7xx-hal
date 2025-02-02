@@ -11,7 +11,7 @@ authors = ["Andrew Straw <strawman@astraw.com>",
            "Florian Jung <flo@windfisch.org>",
            "Matt Ickstadt <mattico8@gmail.com>"]
 edition = "2021"
-rust-version = "1.66.1"
+rust-version = "1.80.0"
 categories = ["embedded", "hardware-support", "no-std"]
 description = "Hardware Abstraction Layer implementation for STM32H7 series microcontrollers"
 keywords = ["arm", "cortex-m", "stm32h7xx", "hal", "embedded-hal"]
@@ -31,7 +31,8 @@ proptest = { version = "1.2.0", optional = true }
 proptest-derive = { version = "0.3.0", optional = true }
 serde = {version = "1.0.150", default-features = false, features = ["derive"]}
 fugit = "0.3.5"
-embedded-hal = { version = "0.2.6", features = ["unproven"] }
+embedded-hal-02 = { package = "embedded-hal", version = "0.2.6", features = ["unproven"] }
+embedded-hal-1 = { package = "embedded-hal", version = "1" }
 embedded-dma = "0.2.0"
 cortex-m = { version = "^0.7.7", features = ["critical-section-single-core"] }
 defmt = { version = ">=0.2.0,<0.4", optional = true }
@@ -51,7 +52,7 @@ fdcan = { version = "0.2", optional = true }
 embedded-storage = "0.3"
 
 [dependencies.smoltcp]
-version = "0.11.0"
+version = "0.12.0"
 default-features = false
 features = ["medium-ethernet", "proto-ipv4", "socket-raw"]
 optional = true
@@ -69,7 +70,7 @@ optional = true
 
 [dev-dependencies]
 cortex-m-rt = ">=0.6.15,<0.8"
-cortex-m-rtic = "1.1"
+rtic = { version = "2.1", features = ["thumbv7-backend"] }
 log = "0.4.11"
 panic-halt = "0.2.0"
 panic-rtt-target = { version = "0.1.0", features = ["cortex-m"] }
@@ -103,6 +104,8 @@ rm0468 = ["gpio-h72"]           # aka. "high speed" devices
 gpio-h72 = []
 gpio-h747 = []
 gpio-h7a2 = []
+
+defmt = ["dep:defmt", "fugit/defmt", "smoltcp?/defmt"]
 
 dsi = ["embedded-display-controller"]
 cm4 = []

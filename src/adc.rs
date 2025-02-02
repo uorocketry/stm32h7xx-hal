@@ -11,8 +11,7 @@
 //! - [Using ADC1 and ADC2 in parallel](https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/adc12_parallel.rs)
 //! - [Using ADC1 through DMA](https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/adc_dma.rs)
 
-use crate::hal::adc::{Channel, OneShot};
-use crate::hal::blocking::delay::DelayUs;
+use embedded_hal_02::blocking::delay::DelayUs;
 
 use core::convert::Infallible;
 use core::marker::PhantomData;
@@ -189,7 +188,7 @@ impl AdcCalLinear {
 macro_rules! adc_pins {
     ($ADC:ident, $($input:ty => $chan:expr),+ $(,)*) => {
         $(
-            impl Channel<$ADC> for $input {
+            impl embedded_hal_02::adc::Channel<$ADC> for $input {
                 type ID = u8;
 
                 fn channel() -> u8 {
@@ -597,7 +596,7 @@ macro_rules! adc_hal {
                     #[cfg(not(feature = "revision_v"))]
                     let f_target = f_adc.raw();
 
-                    let (divider, presc) = match (ker_ck.raw() + f_target - 1) / f_target {
+                    let (divider, presc) = match ker_ck.raw().div_ceil(f_target) {
                         1 => (1, PRESC_A::Div1),
                         2 => (2, PRESC_A::Div2),
                         3..=4 => (4, PRESC_A::Div4),
@@ -823,7 +822,7 @@ macro_rules! adc_hal {
                 /// The value can be then read through the `read_sample` method.
                 // Refer to RM0433 Rev 7 - Chapter 25.4.16
                 pub fn start_conversion<PIN>(&mut self, _pin: &mut PIN)
-                    where PIN: Channel<$ADC, ID = u8>,
+                    where PIN: embedded_hal_02::adc::Channel<$ADC, ID = u8>,
                 {
                     let chan = PIN::channel();
                     assert!(chan <= 19);
@@ -841,7 +840,7 @@ macro_rules! adc_hal {
                 /// This method starts a conversion sequence with DMA
                 /// enabled. The DMA mode selected depends on the [`AdcDmaMode`] specified.
                 pub fn start_conversion_dma<PIN>(&mut self, _pin: &mut PIN, mode: AdcDmaMode)
-                    where PIN: Channel<$ADC, ID = u8>,
+                    where PIN: embedded_hal_02::adc::Channel<$ADC, ID = u8>,
                 {
                     let chan = PIN::channel();
                     assert!(chan <= 19);
@@ -1112,10 +1111,10 @@ macro_rules! adc_hal {
                 }
             }
 
-            impl<WORD, PIN> OneShot<$ADC, WORD, PIN> for Adc<$ADC, Enabled>
+            impl<WORD, PIN> embedded_hal_02::adc::OneShot<$ADC, WORD, PIN> for Adc<$ADC, Enabled>
             where
                 WORD: From<u32>,
-                PIN: Channel<$ADC, ID = u8>,
+                PIN: embedded_hal_02::adc::Channel<$ADC, ID = u8>,
             {
                 type Error = ();
 
